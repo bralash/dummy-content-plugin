@@ -1,158 +1,171 @@
-import { names, bios, jobTitles, locations, phoneNumbers } from "./data";
+// code.ts
+import { names, bios, jobTitles, phoneNumbers, locations } from "./data";
 
-figma.showUI(__html__, { width: 300, height: 550 });
+figma.showUI(__html__, { width: 300, height: 500 });
 
-figma.ui.onmessage = async (msg) => {
-  const selection = figma.currentPage.selection;
+let currentCountry: keyof typeof names = "ghana"; // default
 
-  if (
-    [
-      "generate-name",
-      "generate-email",
-      "generate-bio",
-      "generate-job",
-      "generate-phone",
-      "generate-location",
-      "generate-username",
-      "generate-profile"
-    ].includes(msg.type)
-  ) {
-    if (selection.length === 0) {
-      figma.notify("Please select one or more text layers.");
-      return;
-    }
-
-    for (const node of selection) {
-      if (node.type === "TEXT") {
-        try {
-          await figma.loadFontAsync(node.fontName as FontName);
-
-          if (msg.type === "generate-name") {
-            node.characters = getRandomName();
-          } else if (msg.type === "generate-email") {
-            node.characters = getRandomEmail();
-          } else if (msg.type === "generate-bio") {
-            node.characters = getRandomBio();
-          } else if (msg.type === "generate-job") {
-            node.characters = getRandomJobTitle();
-          } else if (msg.type === "generate-phone") {
-            node.characters = getRandomPhoneNumber();
-          } else if (msg.type === "generate-location") {
-            node.characters = getRandomLocation();
-          } else if (msg.type === "generate-username") {
-            node.characters = generateUsername(getRandomName());
-          } else if (msg.type === "generate-profile") {
-            const profile = getRandomProfile();
-            node.characters = `${profile.name}\n${profile.email}\n${profile.bio}`;
-          }
-        } catch (err) {
-          figma.notify("Could not load font or update text.");
+figma.ui.onmessage = async msg => {
+    const selection = figma.currentPage.selection;
+    const country: keyof typeof names = msg.country || "ghana";
+    if (msg.type === "set-country") {
+        if (msg.country === "ghana" || msg.country === "nigeria") {
+            currentCountry = msg.country;
+            figma.notify(`Switched to ${currentCountry.toUpperCase()} data`);
         }
-      }
+        return;
     }
 
-    figma.notify("Text updated successfully.");
-  }
-
-  if (msg.type === "generate-avatar") {
-    const avatarUrl = msg.url;
-    if (!avatarUrl) {
-      figma.notify("No avatar URL provided.");
-      return;
-    }
-
-    if (selection.length === 0) {
-      figma.notify("Select a shape or image frame to apply avatar.");
-      return;
-    }
-
-    for (const node of selection) {
-      if ("fills" in node && node.type !== "TEXT") {
-        try {
-          const imageBytes = await fetchImageBytes(avatarUrl);
-          const image = figma.createImage(imageBytes);
-          const fills: ImagePaint[] = [
-            {
-              type: "IMAGE",
-              scaleMode: "FILL",
-              imageHash: image.hash,
-            },
-          ];
-          node.fills = fills;
-        } catch (err) {
-          figma.notify("Failed to fetch avatar image.");
+    if (
+        msg.type === "generate-name" ||
+        msg.type === "generate-email" ||
+        msg.type === "generate-bio" ||
+        msg.type === "generate-job" ||
+        msg.type === "generate-phone" ||
+        msg.type === "generate-location" ||
+        msg.type === "generate-username" ||
+        msg.type === "generate-profile"
+    ) {
+        if (selection.length === 0) {
+            figma.notify("Please select one or more text layers.");
+            return;
         }
-      } else {
-        figma.notify("Avatar can only be applied to shape/image layers.");
-      }
+
+        for (const node of selection) {
+            if (node.type === "TEXT") {
+                try {
+                    await figma.loadFontAsync(node.fontName as FontName);
+
+                    const generators: Record<string, () => string> = {
+                        "generate-name": getRandomName,
+                        "generate-email": getRandomEmail,
+                        "generate-bio": getRandomBio,
+                        "generate-job": getRandomJob,
+                        "generate-phone": getRandomPhoneNumber,
+                        "generate-location": getRandomLocation,
+                        "generate-username": getRandomUsername,
+                        "generate-profile": () => {
+                            const profile = getRandomProfile();
+                            return `${profile.name}\n${profile.email}\n${profile.bio}`;
+                        },
+                    };
+
+                    let value = "";
+                    if (generators[msg.type]) {
+                        value = generators[msg.type]();
+                    }
+
+                    if (value) node.characters = value;
+                } catch (err) {
+                    figma.notify("Could not load font or update text.");
+                }
+            }
+        }
+
+        figma.notify("Text updated successfully.");
     }
 
-    figma.notify("Avatar applied to canvas.");
-  }
+    if (msg.type === "generate-avatar") {
+        const avatarUrl = msg.url;
+        if (!avatarUrl) {
+            figma.notify("No avatar URL provided.");
+            return;
+        }
+
+        if (selection.length === 0) {
+            figma.notify("Select a shape or image frame to apply avatar.");
+            return;
+        }
+
+        for (const node of selection) {
+            if ("fills" in node && node.type !== "TEXT") {
+                try {
+                    const imageBytes = await fetchImageBytes(avatarUrl);
+                    const image = figma.createImage(imageBytes);
+                    const fills: ImagePaint[] = [
+                        {
+                            type: "IMAGE",
+                            scaleMode: "FILL",
+                            imageHash: image.hash,
+                        },
+                    ];
+                    node.fills = fills;
+                } catch (err) {
+                    figma.notify("Failed to fetch avatar image.");
+                }
+            } else {
+                figma.notify(
+                    "Avatar can only be applied to shape/image layers."
+                );
+            }
+        }
+
+        figma.notify("Avatar applied to canvas.");
+    }
 };
 
+function getRandomFrom<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function getRandomName(): string {
-  return names[Math.floor(Math.random() * names.length)];
+    return getRandomFrom(names[currentCountry]);
 }
 
 function getRandomBio(): string {
-  return bios[Math.floor(Math.random() * bios.length)];
+    return getRandomFrom(bios[currentCountry]);
 }
 
-function getRandomJobTitle(): string {
-  return jobTitles[Math.floor(Math.random() * jobTitles.length)];
+function getRandomJob(): string {
+    return getRandomFrom(jobTitles[currentCountry]);
 }
 
 function getRandomPhoneNumber(): string {
-  const phone = phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)];
-  return `+233${phone}`;
+    return getRandomFrom(phoneNumbers[currentCountry]);
 }
 
 function getRandomLocation(): string {
-  return locations[Math.floor(Math.random() * locations.length)];
+    return getRandomFrom(locations[currentCountry]);
 }
 
-function slugify(name: string): string {
-  return (
-    name.toLowerCase().replace(/[^a-z]/g, "") +
-    Math.floor(Math.random() * 100)
-  );
+function getRandomUsername(): string {
+    const name = getRandomName()
+        .toLowerCase()
+        .replace(/[^a-z]/g, "");
+    const suffix = Math.floor(Math.random() * 1000);
+    return `@${name}${suffix}`;
 }
 
 function getRandomEmail(): string {
-  const name = getRandomName();
-  const domains = [
-    "gmail.com",
-    "yahoo.com",
-    "ug.edu.gh",
-    "ashesi.edu.gh",
-    "outlook.com",
-  ];
-  const domain = domains[Math.floor(Math.random() * domains.length)];
-  return `${slugify(name)}@${domain}`;
+    const name = getRandomName();
+    const domains = [
+        "gmail.com",
+        "yahoo.com",
+        "ug.edu.gh",
+        "ashesi.edu.gh",
+        "outlook.com",
+    ];
+    const domain = getRandomFrom(domains);
+    return `${slugify(name)}@${domain}`;
 }
 
-function generateUsername(name: string): string {
-  const base = name.toLowerCase().replace(/[^a-z]/g, "");
-  const suffix = Math.floor(Math.random() * 9000) + 1000;
-  return `@${base}${suffix}`;
+function slugify(name: string): string {
+    return (
+        name.toLowerCase().replace(/[^a-z]/g, "") +
+        Math.floor(Math.random() * 100)
+    );
 }
 
-function getRandomProfile(): {
-  name: string;
-  email: string;
-  bio: string;
-} {
-  const name = getRandomName();
-  return {
-    name,
-    email: getRandomEmail(),
-    bio: getRandomBio(),
-  };
+function getRandomProfile() {
+    return {
+        name: getRandomName(),
+        email: getRandomEmail(),
+        bio: getRandomBio(),
+    };
 }
 
 async function fetchImageBytes(url: string): Promise<Uint8Array> {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  return new Uint8Array(arrayBuffer);
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return new Uint8Array(arrayBuffer);
 }

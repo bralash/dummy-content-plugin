@@ -1,189 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js"></script>
-        <style>
-            body {
-                margin: 0;
-                padding: 20px;
-                font-family: "Inter", sans-serif;
-                background: #f2f2f2;
-            }
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Inter", sans-serif;
+        background: #f2f2f2;
+      }
 
-            .panel {
-                background: white;
-                border-radius: 12px;
-                width: 260px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-            }
+      .panel {
+        background: white;
+        border-radius: 12px;
+        width: 260px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
 
-            .section {
-                padding: 16px;
-                border-bottom: 1px solid #eee;
-                cursor: pointer;
-            }
+      .avatar-container {
+        display: flex;
+        justify-content: center;
+        padding: 16px;
+        border-bottom: 1px solid #eee;
+      }
 
-            .section:hover {
-                background-color: #f8f8f8;
-            }
+      .avatar-preview {
+        width: 72px;
+        height: 72px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+      }
 
-            .section:last-child {
-                border-bottom: none;
-            }
+      .toggle-container {
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+      }
 
-            .label {
-                font-size: 10px;
-                font-weight: 600;
-                text-transform: uppercase;
-                color: #555;
-                margin-bottom: 4px;
-            }
+      .toggle-container select {
+        padding: 4px 6px;
+        font-size: 13px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
 
-            .value-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 14px;
-                color: #111;
-            }
+      .section {
+        padding: 14px 16px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
 
-            .footer {
-                background: #1a1a1a;
-                color: white;
-                text-align: center;
-                padding: 12px;
-                cursor: pointer;
-                font-size: 13px;
-                font-weight: 600;
-                border-radius: 0 0 12px 12px;
-            }
+      .section:hover {
+        background-color: #f8f8f8;
+      }
 
-            .footer:hover {
-                background: #000;
-            }
+      .section:last-child {
+        border-bottom: none;
+      }
 
-            .avatar-container {
-                display: flex;
-                justify-content: center;
-                padding: 16px;
-                border-bottom: 1px solid #eee;
-            }
+      .label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 4px;
+      }
 
-            .avatar-preview {
-                width: 72px;
-                height: 72px;
-                border-radius: 8px;
-                object-fit: cover;
-                border: 1px solid #ccc;
-            }
+      .value-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #111;
+      }
 
-            .icon {
-                width: 18px;
-                height: 18px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="panel">
-            <div class="avatar-container">
-                <img
-                    id="avatar"
-                    class="avatar-preview"
-                    src="https://api.dicebear.com/7.x/pixel-art/png?seed=placeholder"
-                    alt="avatar"
-                />
-            </div>
+      .footer {
+        background: #1a1a1a;
+        color: white;
+        text-align: center;
+        padding: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 0 0 12px 12px;
+      }
 
-            <div class="section" onclick="post('generate-name')">
-                <div class="label">Name</div>
-                <div class="value-row">
-                    <span>Random Ghanaian</span>
-                    <i class="icon" data-lucide="shuffle"></i>
-                </div>
-            </div>
+      .footer:hover {
+        background: #000;
+      }
 
-            <div class="section" onclick="post('generate-email')">
-                <div class="label">Email</div>
-                <div class="value-row">
-                    <span>Auto-generated</span>
-                    <i class="icon" data-lucide="mail"></i>
-                </div>
-            </div>
+      .icon {
+        width: 18px;
+        height: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <div class="avatar-container">
+        <img
+          id="avatar"
+          class="avatar-preview"
+          src="https://api.dicebear.com/7.x/pixel-art/png?seed=placeholder"
+          alt="avatar"
+        />
+      </div>
 
-            <div class="section" onclick="post('generate-bio')">
-                <div class="label">Bio</div>
-                <div class="value-row">
-                    <span>Short phrase</span>
-                    <i class="icon" data-lucide="pen-line"></i>
-                </div>
-            </div>
+      <div class="toggle-container">
+        <label for="country">Region:</label>
+        <select id="country" onchange="setCountry(this.value)">
+          <option value="ghana">Ghana</option>
+          <option value="nigeria">Nigeria</option>
+        </select>
+      </div>
 
-            <div class="section" onclick="post('generate-job')">
-                <div class="label">Job Title</div>
-                <div class="value-row">
-                    <span>Designer, Developer...</span>
-                    <i class="icon" data-lucide="briefcase"></i>
-                </div>
-            </div>
-
-            <div class="section" onclick="post('generate-phone')">
-                <div class="label">Phone Number</div>
-                <div class="value-row">
-                    <span>+233 format</span>
-                    <i class="icon" data-lucide="phone"></i>
-                </div>
-            </div>
-
-            <div class="section" onclick="post('generate-location')">
-                <div class="label">Location</div>
-                <div class="value-row">
-                    <span>City, Country</span>
-                    <i class="icon" data-lucide="map-pin"></i>
-                </div>
-            </div>
-
-            <div class="section" onclick="post('generate-username')">
-                <div class="label">Username</div>
-                <div class="value-row">
-                    <span>@handle</span>
-                    <i class="icon" data-lucide="at-sign"></i>
-                </div>
-            </div>
-
-            <div class="section" onclick="generateAvatar()">
-                <div class="label">Avatar</div>
-                <div class="value-row">
-                    <span>Random face</span>
-                    <i class="icon" data-lucide="image"></i>
-                </div>
-            </div>
-
-            <div class="footer" onclick="post('generate-profile')">
-                GENERATE PROFILE
-            </div>
+      <div class="section" onclick="post('generate-name')">
+        <div class="label">Name</div>
+        <div class="value-row">
+          <span>Ghana/Nigeria</span>
+          <i class="icon" data-lucide="user"></i>
         </div>
+      </div>
 
-        <script>
-            lucide.createIcons();
-            function post(type) {
-                parent.postMessage({ pluginMessage: { type } }, "*");
-            }
+      <div class="section" onclick="post('generate-username')">
+        <div class="label">Username</div>
+        <div class="value-row">
+          <span>@handle</span>
+          <i class="icon" data-lucide="at-sign"></i>
+        </div>
+      </div>
 
-            function generateAvatar() {
-                const seed = Math.random().toString(36).substring(2, 10);
-                const url = `https://api.dicebear.com/7.x/pixel-art/png?seed=${seed}`;
+      <div class="section" onclick="post('generate-email')">
+        <div class="label">Email</div>
+        <div class="value-row">
+          <span>Auto-generated</span>
+          <i class="icon" data-lucide="mail"></i>
+        </div>
+      </div>
 
-                // Show in plugin UI
-                document.getElementById("avatar").src = url;
+      <div class="section" onclick="post('generate-bio')">
+        <div class="label">Bio</div>
+        <div class="value-row">
+          <span>Short phrase</span>
+          <i class="icon" data-lucide="pen-line"></i>
+        </div>
+      </div>
 
-                // Send to plugin code to apply to canvas
-                parent.postMessage(
-                    { pluginMessage: { type: "generate-avatar", url } },
-                    "*"
-                );
-            }
-        </script>
-    </body>
+      <div class="section" onclick="post('generate-job')">
+        <div class="label">Job Title</div>
+        <div class="value-row">
+          <span>Profession</span>
+          <i class="icon" data-lucide="briefcase"></i>
+        </div>
+      </div>
+
+      <div class="section" onclick="post('generate-phone')">
+        <div class="label">Phone</div>
+        <div class="value-row">
+          <span>+233 / +234</span>
+          <i class="icon" data-lucide="phone"></i>
+        </div>
+      </div>
+
+      <div class="section" onclick="post('generate-location')">
+        <div class="label">Location</div>
+        <div class="value-row">
+          <span>City, Country</span>
+          <i class="icon" data-lucide="map-pin"></i>
+        </div>
+      </div>
+
+      <div class="section" onclick="generateAvatar()">
+        <div class="label">Avatar</div>
+        <div class="value-row">
+          <span>Random face</span>
+          <i class="icon" data-lucide="image"></i>
+        </div>
+      </div>
+
+      <div class="footer" onclick="post('generate-profile')">
+        GENERATE PROFILE
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      function post(type) {
+        parent.postMessage({ pluginMessage: { type } }, "*");
+      }
+
+      function setCountry(value) {
+        parent.postMessage(
+          { pluginMessage: { type: "set-country", country: value } },
+          "*"
+        );
+      }
+
+      function generateAvatar() {
+        const seed = Math.random().toString(36).substring(2, 10);
+        const url = `https://api.dicebear.com/7.x/pixel-art/png?seed=${seed}`;
+
+        document.getElementById("avatar").src = url;
+
+        parent.postMessage(
+          { pluginMessage: { type: "generate-avatar", url } },
+          "*"
+        );
+      }
+    </script>
+  </body>
 </html>
