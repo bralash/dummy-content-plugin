@@ -1,15 +1,21 @@
-import { names, bios } from "./data";
+import { names, bios, jobTitles, locations, phoneNumbers } from "./data";
 
-figma.showUI(__html__, { width: 300, height: 460 });
+figma.showUI(__html__, { width: 300, height: 550 });
 
 figma.ui.onmessage = async (msg) => {
   const selection = figma.currentPage.selection;
 
   if (
-    msg.type === "generate-name" ||
-    msg.type === "generate-email" ||
-    msg.type === "generate-bio" ||
-    msg.type === "generate-profile"
+    [
+      "generate-name",
+      "generate-email",
+      "generate-bio",
+      "generate-job",
+      "generate-phone",
+      "generate-location",
+      "generate-username",
+      "generate-profile"
+    ].includes(msg.type)
   ) {
     if (selection.length === 0) {
       figma.notify("Please select one or more text layers.");
@@ -27,6 +33,14 @@ figma.ui.onmessage = async (msg) => {
             node.characters = getRandomEmail();
           } else if (msg.type === "generate-bio") {
             node.characters = getRandomBio();
+          } else if (msg.type === "generate-job") {
+            node.characters = getRandomJobTitle();
+          } else if (msg.type === "generate-phone") {
+            node.characters = getRandomPhoneNumber();
+          } else if (msg.type === "generate-location") {
+            node.characters = getRandomLocation();
+          } else if (msg.type === "generate-username") {
+            node.characters = generateUsername(getRandomName());
           } else if (msg.type === "generate-profile") {
             const profile = getRandomProfile();
             node.characters = `${profile.name}\n${profile.email}\n${profile.bio}`;
@@ -85,6 +99,19 @@ function getRandomBio(): string {
   return bios[Math.floor(Math.random() * bios.length)];
 }
 
+function getRandomJobTitle(): string {
+  return jobTitles[Math.floor(Math.random() * jobTitles.length)];
+}
+
+function getRandomPhoneNumber(): string {
+  const phone = phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)];
+  return `+233${phone}`;
+}
+
+function getRandomLocation(): string {
+  return locations[Math.floor(Math.random() * locations.length)];
+}
+
 function slugify(name: string): string {
   return (
     name.toLowerCase().replace(/[^a-z]/g, "") +
@@ -105,7 +132,17 @@ function getRandomEmail(): string {
   return `${slugify(name)}@${domain}`;
 }
 
-function getRandomProfile(): { name: string; email: string; bio: string } {
+function generateUsername(name: string): string {
+  const base = name.toLowerCase().replace(/[^a-z]/g, "");
+  const suffix = Math.floor(Math.random() * 9000) + 1000;
+  return `@${base}${suffix}`;
+}
+
+function getRandomProfile(): {
+  name: string;
+  email: string;
+  bio: string;
+} {
   const name = getRandomName();
   return {
     name,
