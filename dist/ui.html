@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <script src="https://unpkg.com/lucide@0.525.0/dist/umd/lucide.min.js"></script>
+        <style>
+            body {
+                margin: 0;
+                padding: 20px;
+                font-family: "Inter", sans-serif;
+                background: #f2f2f2;
+            }
+
+            .panel {
+                background: white;
+                border-radius: 12px;
+                width: 260px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+
+            .section {
+                padding: 16px;
+                border-bottom: 1px solid #eee;
+                cursor: pointer;
+            }
+
+            .section:hover {
+                background-color: #f8f8f8;
+            }
+
+            .section:last-child {
+                border-bottom: none;
+            }
+
+            .label {
+                font-size: 10px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: #555;
+                margin-bottom: 4px;
+            }
+
+            .value-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 14px;
+                color: #111;
+            }
+
+            .footer {
+                background: #1a1a1a;
+                color: white;
+                text-align: center;
+                padding: 12px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 600;
+                border-radius: 0 0 12px 12px;
+            }
+
+            .footer:hover {
+                background: #000;
+            }
+
+            .avatar-container {
+                display: flex;
+                justify-content: center;
+                padding: 16px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .avatar-preview {
+                width: 72px;
+                height: 72px;
+                border-radius: 8px;
+                object-fit: cover;
+                border: 1px solid #ccc;
+            }
+
+            .icon {
+                width: 18px;
+                height: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="panel">
+            <div class="avatar-container">
+                <img
+                    id="avatar"
+                    class="avatar-preview"
+                    src="https://api.dicebear.com/7.x/pixel-art/png?seed=placeholder"
+                    alt="avatar"
+                />
+            </div>
+
+            <div class="section" onclick="post('generate-name')">
+                <div class="label">Name</div>
+                <div class="value-row">
+                    <span>Random Ghanaian</span>
+                    <i class="icon" data-lucide="shuffle"></i>
+                </div>
+            </div>
+
+            <div class="section" onclick="post('generate-email')">
+                <div class="label">Email</div>
+                <div class="value-row">
+                    <span>Auto-generated</span>
+                    <i class="icon" data-lucide="mail"></i>
+                </div>
+            </div>
+
+            <div class="section" onclick="post('generate-bio')">
+                <div class="label">Bio</div>
+                <div class="value-row">
+                    <span>Short phrase</span>
+                    <i class="icon" data-lucide="pen-line"></i>
+                </div>
+            </div>
+
+            <div class="section" onclick="generateAvatar()">
+                <div class="label">Avatar</div>
+                <div class="value-row">
+                    <span>Random face</span>
+                    <i class="icon" data-lucide="image"></i>
+                </div>
+            </div>
+
+            <div class="footer" onclick="post('generate-profile')">
+                GENERATE PROFILE
+            </div>
+        </div>
+
+        <script>
+            lucide.createIcons();
+            function post(type) {
+                parent.postMessage({ pluginMessage: { type } }, "*");
+            }
+
+            function generateAvatar() {
+                const seed = Math.random().toString(36).substring(2, 10);
+                const url = `https://api.dicebear.com/7.x/pixel-art/png?seed=${seed}`;
+
+                // Show in plugin UI
+                document.getElementById("avatar").src = url;
+
+                // Send to plugin code to apply to canvas
+                parent.postMessage(
+                    { pluginMessage: { type: "generate-avatar", url } },
+                    "*"
+                );
+            }
+        </script>
+    </body>
+</html>

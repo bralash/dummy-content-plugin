@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "jsx": "react",
+    "strict": true,
+    "esModuleInterop": true,
+    "types": ["@figma/plugin-typings"]
+  },
+  "include": ["src"]
+}
