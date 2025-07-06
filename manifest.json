@@ -1,8 +1,13 @@
 {
   "name": "Dummy Content Generator",
-  "id": "ghana-dummy-plugin",
+  "id": "1523768198982951945",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
-  "editorType": ["figma"],
-  "api": "1.0.0"
+  "editorType": ["figma", "figjam"],
+  "api": "1.0.0",
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["https://unpkg.com/","https://api.dicebear.com/"]
+  }
 }
+

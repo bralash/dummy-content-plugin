@@ -58,7 +58,7 @@ const bios = [
   "Design meets Ghana spice — that's me."
 ];
 
-figma.showUI(__html__, { width: 300, height: 450 });
+figma.showUI(__html__, { width: 300, height: 460 });
 figma.ui.onmessage = async (msg) => {
   const selection = figma.currentPage.selection;
   if (msg.type === "generate-name" || msg.type === "generate-email" || msg.type === "generate-bio" || msg.type === "generate-profile") {
